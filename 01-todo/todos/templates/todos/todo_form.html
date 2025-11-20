@@ -1,0 +1,115 @@
+{% extends 'todos/base.html' %}
+
+{% block title %}{% if todo %}Edit TODO{% else %}New TODO{% endif %}{% endblock %}
+
+{% block extra_style %}
+<style>
+    .form-group {
+        margin-bottom: 20px;
+    }
+    label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #333;
+    }
+    input[type="text"],
+    textarea {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #e0e0e0;
+        border-radius: 5px;
+        font-size: 16px;
+        font-family: inherit;
+        transition: border-color 0.3s;
+    }
+    input[type="text"]:focus,
+    textarea:focus {
+        outline: none;
+        border-color: #667eea;
+    }
+    textarea {
+        resize: vertical;
+        min-height: 100px;
+    }
+    .form-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 30px;
+    }
+    .btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s;
+    }
+    .btn-primary {
+        background: #667eea;
+        color: white;
+    }
+    .btn-primary:hover {
+        background: #5568d3;
+    }
+    .btn-secondary {
+        background: #6c757d;
+        color: white;
+    }
+    .btn-secondary:hover {
+        background: #5a6268;
+    }
+    .checkbox-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .checkbox-group input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1>{% if todo %}Edit TODO{% else %}Create New TODO{% endif %}</h1>
+
+<form method="post">
+    {% csrf_token %}
+
+    <div class="form-group">
+        <label for="id_title">Title*</label>
+        <input type="text" name="title" id="id_title" value="{{ form.title.value|default:'' }}" required maxlength="200">
+        {% if form.title.errors %}
+            <div class="error">{{ form.title.errors }}</div>
+        {% endif %}
+    </div>
+
+    <div class="form-group">
+        <label for="id_description">Description</label>
+        <textarea name="description" id="id_description">{{ form.description.value|default:'' }}</textarea>
+        {% if form.description.errors %}
+            <div class="error">{{ form.description.errors }}</div>
+        {% endif %}
+    </div>
+
+    <div class="form-group">
+        <div class="checkbox-group">
+            <input type="checkbox" name="completed" id="id_completed" {% if form.completed.value %}checked{% endif %}>
+            <label for="id_completed" style="margin-bottom: 0;">Completed</label>
+        </div>
+        {% if form.completed.errors %}
+            <div class="error">{{ form.completed.errors }}</div>
+        {% endif %}
+    </div>
+
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a href="{% url 'todo_list' %}" class="btn btn-secondary">Cancel</a>
+    </div>
+</form>
+{% endblock %}

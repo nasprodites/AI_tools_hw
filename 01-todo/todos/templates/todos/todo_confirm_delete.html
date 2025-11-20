@@ -1,0 +1,71 @@
+{% extends 'todos/base.html' %}
+
+{% block title %}Delete TODO{% endblock %}
+
+{% block extra_style %}
+<style>
+    .warning-box {
+        background: #fff3cd;
+        border: 1px solid #ffc107;
+        border-radius: 5px;
+        padding: 20px;
+        margin: 20px 0;
+    }
+    .warning-box h2 {
+        color: #856404;
+        margin-bottom: 10px;
+    }
+    .warning-box p {
+        color: #856404;
+        margin-bottom: 0;
+    }
+    .form-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 30px;
+    }
+    .btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s;
+    }
+    .btn-danger {
+        background: #dc3545;
+        color: white;
+    }
+    .btn-danger:hover {
+        background: #c82333;
+    }
+    .btn-secondary {
+        background: #6c757d;
+        color: white;
+    }
+    .btn-secondary:hover {
+        background: #5a6268;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1>Delete TODO</h1>
+
+<div class="warning-box">
+    <h2>Are you sure?</h2>
+    <p>Do you want to delete the TODO: <strong>"{{ todo.title }}"</strong>?</p>
+    <p>This action cannot be undone.</p>
+</div>
+
+<form method="post">
+    {% csrf_token %}
+    <div class="form-actions">
+        <button type="submit" class="btn btn-danger">Yes, Delete</button>
+        <a href="{% url 'todo_list' %}" class="btn btn-secondary">Cancel</a>
+    </div>
+</form>
+{% endblock %}
