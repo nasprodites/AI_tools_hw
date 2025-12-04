@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import CodeEditor from '../components/CodeEditor';
@@ -15,6 +15,30 @@ function Session() {
   const [language, setLanguage] = useState('javascript');
   const [output, setOutput] = useState('');
   const [sessionUrl, setSessionUrl] = useState('');
+  const [pyodideReady, setPyodideReady] = useState(false);
+  const [isRunning, setIsRunning] = useState(false);
+  const pyodideRef = useRef(null);
+
+  // Initialize Pyodide
+  useEffect(() => {
+    const loadPyodide = async () => {
+      try {
+        if (window.loadPyodide) {
+          const pyodide = await window.loadPyodide({
+            indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.23.4/full/'
+          });
+          pyodideRef.current = pyodide;
+          setPyodideReady(true);
+          console.log('Pyodide loaded successfully');
+        }
+      } catch (error) {
+        console.error('Error loading Pyodide:', error);
+        setOutput('Error loading Python runtime. Please refresh the page.');
+      }
+    };
+
+    loadPyodide();
+  }, []);
 
   useEffect(() => {
     // Set the session URL for sharing
@@ -68,28 +92,105 @@ function Session() {
     }
   };
 
-  const handleRunCode = () => {
+  const runJavaScript = () => {
+    const logs = [];
+    const errors = [];
+
+    // Create a custom console for capturing output
+    const customConsole = {
+      log: (...args) => {
+        logs.push(args.map(arg => {
+          if (typeof arg === 'object') {
+            try {
+              return JSON.stringify(arg, null, 2);
+            } catch (e) {
+              return String(arg);
+            }
+          }
+          return String(arg);
+        }).join(' '));
+      },
+      error: (...args) => {
+        errors.push('ERROR: ' + args.join(' '));
+      },
+      warn: (...args) => {
+        logs.push('WARNING: ' + args.join(' '));
+      },
+      info: (...args) => {
+        logs.push('INFO: ' + args.join(' '));
+      }
+    };
+
+    try {
+      // Create a function with custom console and execute
+      const func = new Function('console', code);
+      const result = func(customConsole);
+
+      // If there's a return value, add it to output
+      if (result !== undefined) {
+        logs.push(`=> ${result}`);
+      }
+
+      // Combine logs and errors
+      const output = [...logs, ...errors].join('\n');
+      setOutput(output || 'Code executed successfully (no output)');
+    } catch (error) {
+      setOutput(`Error: ${error.message}\n\nStack trace:\n${error.stack}`);
+    }
+  };
+
+  const runPython = async () => {
+    if (!pyodideReady || !pyodideRef.current) {
+      setOutput('Python runtime is still loading... Please wait and try again.');
+      return;
+    }
+
+    try {
+      const pyodide = pyodideRef.current;
+
+      // Capture stdout and stderr
+      await pyodide.runPythonAsync(`
+import sys
+from io import StringIO
+
+# Create string buffers for stdout and stderr
+sys.stdout = StringIO()
+sys.stderr = StringIO()
+      `);
+
+      // Run the user's code
+      await pyodide.runPythonAsync(code);
+
+      // Get the output
+      const stdout = await pyodide.runPythonAsync('sys.stdout.getvalue()');
+      const stderr = await pyodide.runPythonAsync('sys.stderr.getvalue()');
+
+      let output = '';
+      if (stdout) output += stdout;
+      if (stderr) output += (output ? '\n' : '') + 'STDERR:\n' + stderr;
+
+      setOutput(output || 'Code executed successfully (no output)');
+    } catch (error) {
+      setOutput(`Error: ${error.message}`);
+    }
+  };
+
+  const handleRunCode = async () => {
+    if (isRunning) return;
+
+    setIsRunning(true);
     setOutput('Running code...');
 
     try {
       if (language === 'javascript') {
-        // Simple JavaScript execution
-        const logs = [];
-        const customConsole = {
-          log: (...args) => logs.push(args.join(' '))
-        };
-
-        // Create a function with custom console
-        const func = new Function('console', code);
-        func(customConsole);
-
-        setOutput(logs.join('\n') || 'Code executed successfully (no output)');
-      } else {
-        // Python will be implemented in Step 5
-        setOutput('Python execution will be available in Step 5 (Pyodide integration)');
+        runJavaScript();
+      } else if (language === 'python') {
+        await runPython();
       }
     } catch (error) {
-      setOutput(`Error: ${error.message}`);
+      setOutput(`Unexpected error: ${error.message}`);
+    } finally {
+      setIsRunning(false);
     }
   };
 
@@ -110,9 +211,16 @@ function Session() {
             language={language}
             onChange={handleLanguageChange}
           />
-          <button onClick={handleRunCode} className="run-btn">
-            Run Code
+          <button
+            onClick={handleRunCode}
+            className="run-btn"
+            disabled={isRunning || (language === 'python' && !pyodideReady)}
+          >
+            {isRunning ? 'Running...' : 'Run Code'}
           </button>
+          {language === 'python' && !pyodideReady && (
+            <span className="loading-indicator">Loading Python...</span>
+          )}
         </div>
       </div>
       <div className="session-content">

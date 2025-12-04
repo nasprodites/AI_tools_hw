@@ -35,6 +35,27 @@
   color: white;
 }
 
+.run-btn:disabled {
+  background-color: #4a4a4a;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.loading-indicator {
+  font-size: 0.85rem;
+  color: #f39c12;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
 .session-content {
   display: flex;
   flex: 1;
