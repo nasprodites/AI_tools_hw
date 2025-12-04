@@ -26,20 +26,16 @@
   text-transform: uppercase;
 }
 
-.editor-textarea {
+.editor-container {
   flex: 1;
-  padding: 1rem;
-  background-color: #1e1e1e;
-  color: #d4d4d4;
-  border: none;
-  outline: none;
-  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-  font-size: 14px;
-  line-height: 1.6;
-  resize: none;
-  tab-size: 2;
+  overflow: hidden;
+  background-color: #282c34;
 }
 
-.editor-textarea::placeholder {
-  color: #6e6e6e;
+.editor-container .cm-editor {
+  height: 100%;
+}
+
+.editor-container .cm-focused {
+  outline: none;
 }
