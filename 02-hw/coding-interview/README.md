@@ -123,19 +123,29 @@ NODE_ENV=production npm start --workspace=server
 
 ## Docker Deployment
 
-Build the Docker image (available after Step 6):
+The application includes a multi-stage Dockerfile for containerized deployment.
+
+### Build the Docker Image
 
 ```bash
 docker build -t coding-interview .
 ```
 
-Run the container:
+### Run the Container
 
 ```bash
 docker run -p 3001:3001 coding-interview
 ```
 
-Access the application at `http://localhost:3001`
+### Access the Application
+
+Open your browser to `http://localhost:3001`
+
+The Docker container:
+- Uses Node.js 20 Alpine for a minimal footprint
+- Builds the frontend in a separate stage
+- Serves the production-built React app from Express
+- Exposes port 3001 by default
 
 ## Environment Variables
 
