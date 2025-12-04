@@ -133,8 +133,11 @@ if (process.env.NODE_ENV === 'production') {
 
 const PORT = process.env.PORT || 3001;
 
-httpServer.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+// Only start the server if this file is run directly (not imported for tests)
+if (require.main === module) {
+  httpServer.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
 
 module.exports = { app, httpServer, io };
