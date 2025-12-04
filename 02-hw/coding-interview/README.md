@@ -52,11 +52,13 @@ This will install dependencies for the root workspace, client, and server using 
 
 ### Start Both Client and Server
 
-The project includes scripts to run the development servers concurrently (available after Step 3):
+The project includes scripts to run the development servers concurrently:
 
 ```bash
 npm run dev
 ```
+
+This will start both the backend server (port 3001) and frontend dev server (port 5173) simultaneously.
 
 ### Start Individually
 
