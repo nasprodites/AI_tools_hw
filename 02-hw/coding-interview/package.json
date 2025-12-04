@@ -12,6 +12,8 @@
     "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
     "dev:server": "npm run dev --workspace=server",
     "dev:client": "npm run dev --workspace=client",
+    "build": "npm run build --workspace=client",
+    "start": "npm start --workspace=server",
     "test": "npm test --workspace=server"
   },
   "keywords": ["coding", "interview", "collaborative", "real-time"],

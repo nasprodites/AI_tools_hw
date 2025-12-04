@@ -147,6 +147,51 @@ The Docker container:
 - Serves the production-built React app from Express
 - Exposes port 3001 by default
 
+## Cloud Deployment
+
+The application is ready for deployment to cloud platforms like Railway, Render, Fly.io, or Heroku.
+
+### Deployment Steps
+
+1. **Push your code to GitHub** (if not already done)
+
+2. **Choose a platform and create a new project:**
+   - [Railway](https://railway.app/)
+   - [Render](https://render.com/)
+   - [Fly.io](https://fly.io/)
+   - [Heroku](https://heroku.com/)
+
+3. **Configure the deployment:**
+   - **Build Command**: `npm install && npm run build`
+   - **Start Command**: `npm start`
+   - **Port**: The app automatically uses the `PORT` environment variable provided by the platform
+
+4. **Set Environment Variables:**
+   - `NODE_ENV=production` (usually set automatically)
+   - `PORT` (usually set automatically by the platform)
+
+### Platform-Specific Notes
+
+**Railway:**
+- Connect your GitHub repository
+- Railway auto-detects the Node.js app
+- No additional configuration needed
+
+**Render:**
+- Create a new Web Service
+- Build Command: `npm install && npm run build`
+- Start Command: `npm start`
+- Render automatically provides PORT
+
+**Fly.io:**
+- Use the Dockerfile deployment method
+- The included Dockerfile handles everything
+
+**Heroku:**
+- Ensure `package.json` has correct start script (already configured)
+- Add Heroku Node.js buildpack
+- Deploy from GitHub or Heroku CLI
+
 ## Environment Variables
 
 - `PORT` - Server port (default: 3001)
